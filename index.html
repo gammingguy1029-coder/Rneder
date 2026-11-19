@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, interactive-widget=resizes-content">
+<title>ShadowBlog - Study Blog</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f7f7f5;color:#1a1a1a;line-height:1.5}
+header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #e8e8e3}
+.top{max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:900;font-size:22px;display:flex;gap:8px;align-items:center}
+.logo span{background:#111;color:#fff;width:32px;height:32px;border-radius:8px;display:grid;place-items:center}
+nav{display:flex;gap:22px;font-size:14px;font-weight:600} nav a{opacity:.75;text-decoration:none;color:inherit}
+.hamburger{display:none;font-size:22px;background:none;border:0;cursor:pointer;padding:8px}
+.mobile-menu{display:none;border-top:1px solid #eee;padding:10px 16px;background:#fff}
+.mobile-menu.open{display:block} .mobile-menu a{display:block;padding:10px 0;font-weight:600;text-decoration:none;color:inherit;border-bottom:1px solid #f0f0f0}
+.hero{max-width:1100px;margin:0 auto;padding:28px 16px 8px} .hero h1{font-size:clamp(28px,5vw,44px);line-height:1.05;letter-spacing:-1px} .hero p{color:#6b6b6b;margin-top:10px;max-width:640px}
+.grid{max-width:1100px;margin:0 auto;padding:18px 16px 40px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{background:#fff;border:1px solid #e8e8e3;border-radius:16px;overflow:hidden}
+.card-pad{padding:18px} .badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;background:#f1f1ed;padding:4px 8px;border-radius:999px;color:#555}
+.card h2{font-size:clamp(18px,3vw,22px);margin:10px 0 8px} .card p.ex{color:#6b6b6b;font-size:14px} .meta{font-size:12px;color:#999;margin-top:10px}
+.comments{border-top:1px solid #e8e8e3;padding:14px 18px 16px;background:#fbfbf9}
+.comment{font-size:13px;background:#fff;border:1px solid #eee;padding:8px 10px;border-radius:10px;margin-bottom:8px;word-wrap:break-word}
+.hint{font-size:11px;color:#999;margin:8px 0}
+.comment-row{display:flex;gap:8px} .comment-row input{flex:1;min-width:0;padding:12px;border:1px solid #ddd;border-radius:999px;font-size:15px;outline:none} .comment-row button{width:44px;height:44px;min-width:44px;border:0;border-radius:50%;background:#111;color:#fff;font-size:18px;cursor:pointer}
+footer{max-width:1100px;margin:0 auto;padding:20px 16px 40px;color:#999;font-size:13px;text-align:center;border-top:1px solid #e8e8e3}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:none;align-items:flex-end;justify-content:center} .overlay.open{display:flex}
+.sheet{background:#fff;width:100%;max-width:520px;max-height:92dvh;overflow-y:auto;border-radius:20px 20px 0 0;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+.sheet h3{font-size:22px} .sub{color:#6b6b6b;font-size:13px;margin:6px 0 16px}
+.field{margin-bottom:12px} .field label{font-size:12px;font-weight:700;display:block;margin-bottom:6px} .field input{width:100%;padding:13px 12px;border:1px solid #ddd;border-radius:12px;font-size:16px;outline:none}
+.btn{width:100%;padding:13px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:800;font-size:15px;cursor:pointer} .btn-ghost{background:#f1f1ed;color:#111} .btn-small{padding:9px 10px;font-size:13px;border-radius:10px;width:auto}
+.row{display:flex;gap:8px;flex-wrap:wrap} .close{float:right;background:#f1f1ed;border:0;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px}
+.err{color:#c00;font-size:13px;margin:8px 0;display:none} .ok{color:#0a7a2f;font-size:13px;margin:8px 0;display:none}
+.chat-wrap{display:flex;flex-direction:column;height:92dvh;max-height:92dvh} .chat-head{padding:12px 0;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 2px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:85%;padding:10px 12px;border-radius:16px;background:#f1f1ed;font-size:15px;word-wrap:break-word;white-space:pre-wrap} .msg.mine{align-self:flex-end;background:#111;color:#fff} .msg .who{font-size:11px;font-weight:800;opacity:.7;display:block;margin-bottom:4px} .msg .time{font-size:10px;opacity:.6;display:block;margin-top:4px}
+.msg.owner{border:2px solid #f5b301;box-shadow:0 0 18px rgba(245,179,1,.45);background:linear-gradient(135deg,#fff8e1,#fff);color:#111;animation:shine 2.2s infinite}
+@keyframes shine{0%,100%{box-shadow:0 0 12px rgba(245,179,1,.35)}50%{box-shadow:0 0 22px rgba(245,179,1,.7)}}
+.owner-name{background:linear-gradient(90deg,#b8860b,#f5b301,#ff6b9d,#7b61ff,#f5b301);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
+.owner-badge{display:inline-block;background:linear-gradient(90deg,#f5b301,#ff8a00);color:#fff;font-size:10px;padding:2px 7px;border-radius:999px}
+.chat-input{position:sticky;bottom:0;background:#fff;padding:10px 0 calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;border-top:1px solid #eee} .chat-input input{flex:1;min-width:0;padding:13px 12px;border:1px solid #ddd;border-radius:999px;font-size:16px;outline:none} .chat-input button{width:48px;height:48px;min-width:48px;border:0;border-radius:50%;background:#111;color:#fff;font-size:20px;cursor:pointer}
+.code-card{border:1px solid #eee;border-radius:12px;padding:12px;margin-bottom:10px} .pill{font-size:11px;padding:3px 8px;border-radius:999px;background:#e6f7ea;color:#0a7a2f;font-weight:800} .pill.off{background:#fde8e8;color:#b00}
+@media(min-width:769px){.overlay{align-items:center}.sheet{border-radius:20px;padding:24px}.chat-wrap{height:80vh}}
+@media(max-width:768px){nav{display:none}.hamburger{display:block}.grid{grid-template-columns:1fr}}
+@media(max-width:480px){.msg{max-width:92%}}
+</style>
+</head>
+<body>
+<header><div class="top"><div class="logo"><span>S</span> ShadowBlog</div><nav><a href="#" onclick="return false">Home</a><a href="#" onclick="return false">Notes</a><a href="#" onclick="return false">Study Tips</a><a href="#" onclick="return false">About</a></nav><button class="hamburger" id="hamburgerBtn">☰</button></div><div class="mobile-menu" id="mobileMenu"><a href="#" onclick="return false">Home</a><a href="#" onclick="return false">Notes</a><a href="#" onclick="return false">Study Tips</a><a href="#" onclick="return false">About</a></div></header>
+<div class="hero"><h1>Study notes, gentle focus,<br>honest progress.</h1><p>Short notes for students who want to study better without pressure. Read, reflect, revise — one small step at a time.</p><p style="font-size:12px;color:#0a7a2f;margin-top:8px">● Connected to Render DB — messages sync across all phones</p></div>
+<div class="grid" id="blogGrid"></div>
+<footer>Made for students • ShadowBlog • Study Blog<br><span style="font-size:11px">Tip for owner: type /join CODE in any comment to open secret rooms</span></footer>
+
+<div class="overlay" id="loginOverlay"><div class="sheet"><button class="close" onclick="closeOverlay('loginOverlay')">×</button><h3 id="loginTitle">Welcome back</h3><p class="sub">Login to continue to your secret room. New here? Switch to Register.</p><div class="field"><label>Username</label><input id="loginUser" type="text" autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="username"></div><div class="field"><label>Password</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="password"></div><div id="loginErr" class="err"></div><div id="loginOk" class="ok"></div><button class="btn" id="loginBtn">Login & Open Room →</button><button class="btn btn-ghost" id="toggleAuthBtn" style="margin-top:8px">New user? Create account</button><p style="font-size:11px;color:#999;margin-top:10px;text-align:center">Admin login: admin / your ADMIN_PASSWORD from Render<br>Session saved as cookie for 30 days.</p></div></div>
+
+<div class="overlay" id="chatOverlay"><div class="sheet chat-wrap"><div class="chat-head"><div><b id="chatTitle">Room</b><div id="chatSub" style="font-size:12px;color:#888"></div></div><button class="close" onclick="closeOverlay('chatOverlay')">×</button></div><div class="chat-msgs" id="chatMsgs"></div><div style="font-size:11px;color:#999">Type /admin for Admin Chat • /rooms for rooms • /logout to logout</div><div class="chat-input"><input id="chatInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" placeholder="Type a message..."><button id="chatSendBtn">→</button></div></div></div>
+
+<div class="overlay" id="roomsOverlay"><div class="sheet"><button class="close" onclick="closeOverlay('roomsOverlay')">×</button><h3>Your Rooms</h3><p class="sub">Rooms you unlocked with codes.</p><div id="roomsList"></div><button class="btn btn-ghost" onclick="closeOverlay('roomsOverlay')" style="margin-top:12px">Close</button></div></div>
+
+<div class="overlay" id="adminOverlay"><div class="sheet"><button class="close" onclick="closeOverlay('adminOverlay')">×</button><h3>👑 Admin Panel <span style="font-size:12px;background:#f5b301;color:#fff;padding:3px 8px;border-radius:999px">OWNER</span></h3><p class="sub">Only admin can create codes. Validate / Invalidate any code here.</p><div class="field"><label>New Room Name</label><input id="newRoomName" placeholder="e.g. VIP Room"></div><button class="btn" id="genCodeBtn">+ Generate New Code (Admin Only)</button><div id="genResult" class="ok"></div><h4 style="margin:16px 0 8px">All Room Codes</h4><div id="codesList"></div><h4 style="margin:16px 0 8px">Admin Chat</h4><button class="btn" onclick="openRoom('ADMIN')">Open Admin Chat 🔒</button><h4 style="margin:16px 0 8px">Backup</h4><p style="font-size:12px;color:#666">Render Postgres Free clears after ~30 days. Take DB backup in Render Dashboard before.</p><div class="row" style="margin-top:8px"><button class="btn btn-small btn-ghost" onclick="logout()">Logout</button></div><div id="adminUsers" style="margin-top:14px;font-size:13px"></div></div></div>
+
+<script>
+const POSTS=[
+{id:1,tag:"Focus",title:"Writing in public, gently",ex:"You do not need a perfect first draft. Publish the honest version, listen carefully, and revise more than typos.",author:"admin",time:"2h ago"},
+{id:2,tag:"Notes",title:"What makes a room feel alive?",ex:"Rooms feel alive when people return to them. Small rituals, kind replies, and remembering names.",author:"admin",time:"9h ago"},
+{id:3,tag:"Study",title:"How to focus for exams",ex:"25 minutes study, 5 minutes break. Phone in another room. One topic at a time.",author:"admin",time:"1d ago"},
+{id:4,tag:"Study",title:"Best notes method",ex:"Write in your own words. Use headings, 3 bullet points max per idea, revise same day.",author:"admin",time:"2d ago"},
+{id:5,tag:"Maths",title:"Maths revision plan",ex:"Day 1: Formulas. Day 2: 20 problems. Day 3: Mistakes notebook. Day 4: Mock test.",author:"admin",time:"3d ago"},
+{id:6,tag:"Mindset",title:"Slow progress is still progress",ex:"If you studied 20 minutes today, that counts. Consistency beats intensity.",author:"admin",time:"4d ago"},
+];
+let currentUser=null, pendingCode=null, isRegister=false, currentRoom=null, pollTimer=null;
+function closeOverlay(id){document.getElementById(id).classList.remove('open')}
+function openOverlay(id){document.getElementById(id).classList.add('open')}
+document.getElementById('hamburgerBtn').onclick=()=>document.getElementById('mobileMenu').classList.toggle('open');
+async function loadMe(){ try{ let r=await fetch('/api/me'); let d=await r.json(); currentUser=d.user; }catch(e){} }
+function esc(s){return s.replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+function renderBlog(){
+  let grid=document.getElementById('blogGrid'); grid.innerHTML='';
+  POSTS.forEach(p=>{
+    let card=document.createElement('div'); card.className='card';
+    card.innerHTML=`<div class="card-pad"><span class="badge">${p.tag} • 0${p.id}</span><h2>${p.title}</h2><p class="ex">${p.ex}</p><div class="meta">👤 ${p.author} • ${p.time}</div></div><div class="comments"><h4>💬 Comments</h4><div id="clist-${p.id}"></div><div class="hint">Comments are moderated. Type /join CODE or /admin to open a secret room — codes are never posted.</div><div class="comment-row"><input id="cinput-${p.id}" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" placeholder="Write a comment..."><button data-post="${p.id}" class="csend">→</button></div></div>`;
+    grid.appendChild(card);
+    loadComments(p.id);
+    let inp=card.querySelector(`#cinput-${p.id}`);
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter') handleComment(p.id)});
+    card.querySelector('.csend').onclick=()=>handleComment(p.id);
+  });
+}
+async function loadComments(pid){
+  try{ let r=await fetch(`/api/posts/${pid}/comments`); let list=await r.json();
+    let el=document.getElementById(`clist-${pid}`); if(!el) return;
+    el.innerHTML=list.length?'':'<div style="font-size:13px;color:#999">No comments yet. Be the first.</div>';
+    list.forEach(c=>{ let d=document.createElement('div'); d.className='comment'; d.innerHTML=`<b>${esc(c.username)}</b><br>${esc(c.text)}`; el.appendChild(d); });
+  }catch(e){}
+}
+async function handleComment(pid){
+  let inp=document.getElementById(`cinput-${pid}`); let text=inp.value.trim(); if(!text) return;
+  let low=text.toLowerCase();
+  if(low.startsWith('/join')||low.startsWith('/admin')||low==='/rooms'||low==='/logout'){
+    if(low==='/rooms'){ if(!currentUser){pendingCode='__rooms'; openOverlay('loginOverlay'); return;} openRooms(); inp.value=''; return; }
+    if(low==='/logout'){ inp.value=''; logout(); return; }
+    let code=low.startsWith('/admin')?'ADMIN':(text.split(/\s+/)[1]||'').toUpperCase();
+    pendingCode=code; inp.value='';
+    if(currentUser){ tryOpenCode(code); } else { openOverlay('loginOverlay'); setTimeout(()=>document.getElementById('loginUser').focus(),100); }
+    return;
+  }
+  await fetch(`/api/posts/${pid}/comments`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+  inp.value=''; loadComments(pid); inp.focus();
+}
+async function tryOpenCode(code){
+  let r=await fetch(`/api/codes/${code}/check`); let d=await r.json();
+  if(!d.ok){ alert(d.error||'Code not found'); return; }
+  openRoom(code);
+}
+function openRoom(code){
+  currentRoom=code;
+  document.getElementById('chatTitle').textContent=code==='ADMIN'?'Admin Chat':code+' Room';
+  document.getElementById('chatSub').textContent='Code: '+code+(code==='ADMIN'?' • 🔒 Owner Only':' • Private • Render DB');
+  closeOverlay('loginOverlay'); closeOverlay('roomsOverlay'); closeOverlay('adminOverlay');
+  openOverlay('chatOverlay'); loadMsgs();
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer=setInterval(loadMsgs,2000);
+  setTimeout(()=>{let i=document.getElementById('chatInput'); if(i) i.focus();},80);
+}
+async function loadMsgs(){
+  if(!currentRoom) return;
+  let r=await fetch(`/api/rooms/${currentRoom}/messages`); let list=await r.json();
+  let box=document.getElementById('chatMsgs'); box.innerHTML='';
+  if(!list.length){ box.innerHTML='<div style="font-size:13px;color:#999;text-align:center;padding:20px">No messages yet. Say hi 👋</div>'; return; }
+  list.forEach(m=>{
+    let d=document.createElement('div'); let isOwner=m.role==='OWNER'; let isMine=currentUser&&m.username===currentUser.username;
+    d.className='msg'+(isMine?' mine':'')+(isOwner?' owner':'');
+    let nameHtml=isOwner?`<span class="owner-name">👑 ${esc(m.username)}</span> <span class="owner-badge">OWNER</span>`:esc(m.username)+` <span style="font-size:10px;background:#eee;padding:2px 6px;border-radius:999px">${esc(m.role||'Member')}</span>`;
+    d.innerHTML=`<span class="who">${nameHtml}</span>${esc(m.text)}<span class="time">${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>`;
+    box.appendChild(d);
+  });
+  box.scrollTop=box.scrollHeight;
+}
+async function sendChat(){
+  let inp=document.getElementById('chatInput'); let text=inp.value.trim(); if(!text||!currentRoom) return;
+  let low=text.toLowerCase();
+  if(low==='/admin'){ inp.value=''; tryOpenCode('ADMIN'); return; }
+  if(low==='/rooms'){ inp.value=''; openRooms(); return; }
+  if(low==='/logout'){ inp.value=''; logout(); return; }
+  if(low.startsWith('/join')){ let c=text.split(/\s+/)[1]||''; inp.value=''; tryOpenCode(c.toUpperCase()); return; }
+  await fetch(`/api/rooms/${currentRoom}/messages`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+  inp.value=''; loadMsgs(); inp.focus();
+}
+document.getElementById('chatSendBtn').onclick=sendChat;
+document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter') sendChat()});
+document.getElementById('toggleAuthBtn').onclick=()=>{
+  isRegister=!isRegister;
+  document.getElementById('loginTitle').textContent=isRegister?'Create account':'Welcome back';
+  document.getElementById('loginBtn').textContent=isRegister?'Register & Open Room →':'Login & Open Room →';
+  document.getElementById('toggleAuthBtn').textContent=isRegister?'Have an account? Login':'New user? Create account';
+};
+document.getElementById('loginBtn').onclick=async ()=>{
+  let u=document.getElementById('loginUser').value.trim(); let p=document.getElementById('loginPass').value;
+  let err=document.getElementById('loginErr'), ok=document.getElementById('loginOk'); err.style.display='none'; ok.style.display='none';
+  if(!u||!p){ err.textContent='Enter username and password'; err.style.display='block'; return; }
+  let url=isRegister?'/api/auth/register':'/api/auth/login';
+  let r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+  let d=await r.json();
+  if(!r.ok){ err.textContent=d.error||'Error'; err.style.display='block'; return; }
+  currentUser={username:d.username,role:d.role}; ok.textContent='Logged in as '+d.username+' ('+d.role+')'; ok.style.display='block';
+  setTimeout(()=>{ if(pendingCode==='__rooms'){ openRooms(); } else if(pendingCode){ tryOpenCode(pendingCode); } else if(currentUser.role==='OWNER'){ openOverlay('adminOverlay'); renderAdmin(); } else { openRooms(); } },400);
+};
+async function openRooms(){
+  let list=document.getElementById('roomsList'); list.innerHTML='';
+  if(currentUser&&currentUser.role==='OWNER'){ let b=document.createElement('button'); b.className='btn'; b.style.marginBottom='8px'; b.textContent='👑 Admin Panel'; b.onclick=()=>{closeOverlay('roomsOverlay'); openOverlay('adminOverlay'); renderAdmin();}; list.appendChild(b); }
+  ['MOON123','VIP99'].forEach(code=>{ let b=document.createElement('button'); b.className='btn btn-ghost'; b.style.marginBottom='8px'; b.textContent='💬 '+code+' Room • '+code; b.onclick=()=>tryOpenCode(code); list.appendChild(b); });
+  if(currentUser&&currentUser.role==='OWNER'){ let b=document.createElement('button'); b.className='btn btn-ghost'; b.style.marginBottom='8px'; b.textContent='🔒 Admin Chat • ADMIN'; b.onclick=()=>tryOpenCode('ADMIN'); list.appendChild(b); }
+  openOverlay('roomsOverlay');
+}
+async function renderAdmin(){
+  let r=await fetch('/api/codes'); let codes=await r.json(); let el=document.getElementById('codesList'); el.innerHTML='';
+  codes.forEach(c=>{
+    let d=document.createElement('div'); d.className='code-card';
+    d.innerHTML=`<div style="display:flex;justify-content:space-between"><b>${c.code}</b><span class="pill ${c.active?'':'off'}">${c.active?'Active':'Invalid'}</span></div><div style="font-size:13px;color:#666">${c.room} ${c.admin_only?'• 🔒 Admin Only':''}</div><div class="row" style="margin-top:8px"><button class="btn btn-small" onclick="toggleCode('${c.code}',true)">✅ Validate</button><button class="btn btn-small btn-ghost" onclick="toggleCode('${c.code}',false)">⛔ Invalidate</button><button class="btn btn-small btn-ghost" onclick="deleteCode('${c.code}')">🗑 Delete</button><button class="btn btn-small btn-ghost" onclick="tryOpenCode('${c.code}')">Open →</button></div>`;
+    el.appendChild(d);
+  });
+  let ru=await fetch('/api/users'); let users=await ru.json();
+  document.getElementById('adminUsers').innerHTML='<b>Users ('+users.length+'):</b> '+users.map(u=>u.username+' ('+u.role+')').join(', ');
+}
+window.toggleCode=async (code,v)=>{ await fetch(`/api/codes/${code}/${v?'validate':'invalidate'}`,{method:'POST'}); renderAdmin(); };
+window.deleteCode=async (code)=>{ if(confirm('Delete '+code+'?')){ await fetch(`/api/codes/${code}`,{method:'DELETE'}); renderAdmin(); } };
+document.getElementById('genCodeBtn').onclick=async ()=>{
+  let name=document.getElementById('newRoomName').value.trim()||'New Room';
+  let r=await fetch('/api/codes',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room:name})});
+  let d=await r.json();
+  if(!r.ok){ alert(d.error||'Only admin'); return; }
+  document.getElementById('genResult').textContent='✅ Created: '+d.code+' for '+d.room+' — share as /join '+d.code; document.getElementById('genResult').style.display='block';
+  document.getElementById('newRoomName').value=''; renderAdmin();
+};
+async function logout(){ await fetch('/api/auth/logout',{method:'POST'}); currentUser=null; if(pollTimer) clearInterval(pollTimer); closeOverlay('chatOverlay'); closeOverlay('adminOverlay'); closeOverlay('roomsOverlay'); alert('Logged out. Top bar still looks like study blog.'); }
+loadMe().then(renderBlog);
+</script>
+</body>
+</html>
